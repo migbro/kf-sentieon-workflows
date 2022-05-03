@@ -18,21 +18,20 @@ arguments:
     valueFrom: >-
       set -eo pipefail
 
-      i=0
-      cat $(inputs.shard_intervals) | while read slice
-      do
-          sliced="$(inputs.input_vcf.nameroot.replace('.g.vcf',''))-$i.g.vcf.gz"
-          echo "bcftools view -r $slice $(inputs.input_vcf.path) | sentieon util vcfconvert - $sliced" >> cmd.txt        
-          i=`expr $i + 1`
-      done
+      ${
+        var cmd = "";
+        for (var i=0; i < inputs.shard_bed.length; i++){
+          var slice = inputs.input_vcf.nameroot.replace('.g.vcf','') + "-" + i + ".g.vcf.gz";
+          cmd += 'echo "bcftools view ' + inputs.input_vcf.path + ' -R ' + inputs.shard_bed[i].path + ' -O z > ' + slice + '" >> cmd.txt;';
+        }
+      }
 
       cat cmd.txt | xargs -P $(inputs.cores) -I % sh -c -f "%" || exit 1
 
 inputs:
   input_vcf: {type: File, doc: "VCF file to shard."}
-  shard_intervals: { type: File, doc: "output file from generate_shards" }
+  shard_bed: { type: 'File[]', doc: "shard bed file array" }
   cores: { type: 'int?', default: 8 } 
-
 
 outputs:
   sharded_vcf:
