@@ -44,6 +44,11 @@ requirements:
   - envName: SENTIEON_LICENSE
     envValue: $(inputs.sentieon_license)
 - class: InlineJavascriptRequirement
+- class: InitialWorkDirRequirement
+  listing:
+  - entryname: gvcf_list.txt
+    entry: |
+      $(inputs.input_vcfs.map(function(e){return e.path}).join("\n"))
 
 inputs:
 - id: sentieon_license
@@ -76,18 +81,12 @@ inputs:
   label: Input GVCFs
   type:
     type: array
-    inputBinding:
-      position: 0
-      shellQuote: true
     items: File
   secondaryFiles:
   - pattern: .tbi
     required: false
   - pattern: .idx
     required: false
-  inputBinding:
-    position: 110
-    shellQuote: true
   sbg:fileTypes: VCF, VCF.GZ, GVCF, GVCF.GZ
 - id: dbSNP
   label: dbSNP VCF file
@@ -212,3 +211,15 @@ arguments:
             return "output.vcf.gz"
     }
   shellQuote: false
+- prefix: ''
+  position: 101
+  valueFrom: >-
+    - < gvcf_list.txt
+  shellQuote: false
+
+$namespaces:
+  sbg: https://sevenbridges.com
+hints:
+  - class: 'sbg:AWSInstanceType'
+    value: "c5.9xlarge;ebs-gp2;2048"
+
