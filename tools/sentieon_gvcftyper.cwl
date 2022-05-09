@@ -182,6 +182,11 @@ inputs:
   label: Memory per job
   doc: Memory per job[MB]
   type: int?
+- id: use_file_list
+  doc: "Flag to use vcf file list instead of loading vcf files to command line"
+  type: boolean?
+  default: true
+
 
 outputs:
 - id: output_vcf
@@ -214,7 +219,16 @@ arguments:
 - prefix: ''
   position: 101
   valueFrom: >-
-    - < gvcf_list.txt
+    ${
+      if(inputs.use_file_list){
+        return " - < gvcf_list.txt"
+      }
+      else{
+        var cmd = " ";
+        cmd += inputs.input_vcfs.map(function(e){return e.path}).join(" ");
+        return cmd;
+      }
+    }
   shellQuote: false
 
 $namespaces:

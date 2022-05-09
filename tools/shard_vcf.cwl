@@ -22,7 +22,7 @@ arguments:
         var cmd = "";
         for (var i=0; i < inputs.shard_bed.length; i++){
           var slice = inputs.input_vcf.nameroot.replace('.g.vcf','') + "-" + i + ".g.vcf.gz";
-          cmd += 'echo "bcftools view ' + inputs.input_vcf.path + ' -R ' + inputs.shard_bed[i].path + ' | bgzip > ' + slice + '" >> subset_cmd.txt;\n';
+          cmd += 'echo "bcftools view --no-version ' + inputs.input_vcf.path + ' -R ' + inputs.shard_bed[i].path + ' | bgzip > ' + slice + '" >> subset_cmd.txt;\n';
         }
         return cmd;
       }
