@@ -14,8 +14,13 @@ def time_check(msg):
  
 
 def print_sorted(call):
-    info = call.decode().rstrip(chr(10)).split(chr(9))
-    sys.stdout.write(chr(9).join(info[0:9]) + chr(9) + chr(9).join([info[9:][i] for i in samp_map]) + chr(10))
+    try:
+        info = call.decode().rstrip(chr(10)).split(chr(9))
+        print(chr(9).join(info[0:9]) + chr(9) + chr(9).join([info[9:][i] for i in samp_map]))
+    except Exception as e:
+        sys.stderr.write(str(e) + chr(10))
+        sys.stderr.write('Output failed likely due to file marker, outputting marker and skip sample sort' + chr(10))
+        sys.stdout.write(call.decode())
 
 
 parser = argparse.ArgumentParser()
